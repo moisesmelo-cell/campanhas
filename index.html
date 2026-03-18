@@ -1,201 +1,264 @@
-<!DOCTYPE html>
-<html lang="pt-br">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Painel de Performance - Xertica.ai</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
-    <style>
-        body { 
-            font-family: 'Inter', sans-serif; 
-            background-color: #050505; 
-            color: #cbd5e1; 
-            overflow-x: hidden;
-        }
-        .bg-blur-sky { 
-            position: fixed; 
-            top: -10%; 
-            left: -10%; 
-            width: 40%; 
-            height: 40%; 
-            background: rgba(14, 165, 233, 0.1); 
-            filter: blur(120px); 
-            border-radius: 50%; 
-            pointer-events: none; 
-        }
-        .bg-blur-emerald { 
-            position: fixed; 
-            bottom: -10%; 
-            right: -10%; 
-            width: 30%; 
-            height: 30%; 
-            background: rgba(16, 185, 129, 0.05); 
-            filter: blur(100px); 
-            border-radius: 50%; 
-            pointer-events: none; 
-        }
-        /* Transição suave para troca de abas */
-        .fade-in {
-            animation: fadeIn 0.4s ease-out;
-        }
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(10px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-    </style>
-</head>
-<body>
-    <div class="bg-blur-sky"></div>
-    <div class="bg-blur-emerald"></div>
+import React from 'react';
+import { 
+  Users, 
+  Target, 
+  MousePointer2, 
+  BarChart3,
+  Globe, 
+  MessageSquare,
+  AlertCircle,
+  CheckCheck,
+  Eye,
+  ExternalLink,
+  FileSpreadsheet
+} from 'lucide-react';
 
-    <div class="relative z-10 max-w-7xl mx-auto px-6 py-8">
-        <header class="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-12">
-            <div>
-                <div class="flex items-center gap-3 mb-4">
-                    <img src="https://storage.googleapis.com/etp-bucket/Logos%20Xertica.ai%20(.png)/xertica.ai/Copy%20of%20Logo_XERTICA_white.png" alt="Xertica" class="h-6" onerror="this.src='https://via.placeholder.com/120x30/000000/FFFFFF?text=Xertica.ai'">
-                    <div class="h-4 w-px bg-white/20"></div>
-                    <span class="text-xs font-bold tracking-[0.3em] uppercase text-slate-500">Analytics de Campanha</span>
-                </div>
-                <h1 class="text-4xl font-extrabold text-white tracking-tight">Painel de Performance</h1>
-                <p id="campaign-desc" class="text-slate-400 mt-2 max-w-xl transition-all duration-300">
-                    Foco em modernização do setor público. 
-                    <span class="ml-2 px-2 py-0.5 bg-white/5 rounded text-sky-400 text-xs font-mono">Ref: 16/03/2026</span>
-                </p>
-            </div>
-            
-            <div class="flex bg-slate-900/50 p-1 rounded-2xl border border-white/5 backdrop-blur-xl">
-                <button onclick="switchTab('summit')" id="btn-summit" class="px-6 py-2.5 rounded-xl text-sm font-bold transition-all duration-300">
-                    Public Sector Summit
-                </button>
-                <button onclick="switchTab('enastic')" id="btn-enastic" class="px-6 py-2.5 rounded-xl text-sm font-bold transition-all duration-300">
-                    Enastic
-                </button>
-            </div>
+const App = () => {
+  // Dados das Campanhas consolidados
+  const campaigns = [
+    {
+      id: 'summit',
+      title: "Public Sector Summit",
+      description: "Foco em modernização do setor público.",
+      dateRef: "16/03/2026",
+      dataSourceUrl: "https://docs.google.com/spreadsheets/d/1sXpsFnlwoaFEzMUnty_5fkhTuLMO3tqK/edit?usp=sharing&ouid=117859638756754897994&rtpof=true&sd=true",
+      kpis: [
+        { label: "Mensagens Totais", value: "323", icon: <MessageSquare size={20} />, color: "text-white" },
+        { label: "Taxa de Leitura", value: "39.6%", icon: <Eye size={20} />, color: "text-pink-500" },
+        { label: "Respostas", value: "12", icon: <MessageSquare size={20} />, color: "text-emerald-400" },
+        { label: "Taxa de Entrega", value: "24.1%", icon: <CheckCheck size={20} />, color: "text-sky-400" },
+      ],
+      whatsappStats: [
+        { 
+          status: "Lida", 
+          qty: 128, 
+          pct: "39,60%", 
+          icon: <Eye size={14} className="text-pink-500" />, 
+          color: "bg-pink-500",
+          textColor: "text-pink-500"
+        },
+        { 
+          status: "Entregue", 
+          qty: 78, 
+          pct: "24,10%", 
+          icon: <CheckCheck size={14} className="text-sky-400" />, 
+          color: "bg-sky-400",
+          textColor: "text-sky-400"
+        },
+        { 
+          status: "Respondida", 
+          qty: 12, 
+          pct: "3,70%", 
+          icon: <MessageSquare size={14} className="text-emerald-400" />, 
+          color: "bg-emerald-400",
+          textColor: "text-emerald-400"
+        },
+        { 
+          status: "Não Entregue (ERRO)", 
+          qty: 105, 
+          pct: "32,50%", 
+          icon: <AlertCircle size={14} className="text-red-500" />, 
+          color: "bg-red-500",
+          textColor: "text-red-500"
+        },
+      ]
+    },
+    {
+      id: 'enastic',
+      title: "Enastic",
+      description: "Estratégias de IA para o Ecossistema de Justiça.",
+      dateRef: "18/03/2026",
+      dataSourceUrl: "https://docs.google.com/spreadsheets/d/1jVS2HP38N2RvqOo-BatzQM6LUbGVPMOU/edit?usp=sharing&ouid=117859638756754897994&rtpof=true&sd=true",
+      kpis: [
+        { label: "Mensagens Totais", value: "90", icon: <MessageSquare size={20} />, color: "text-white" },
+        { label: "Taxa de Leitura", value: "27.78%", icon: <Eye size={20} />, color: "text-pink-500" },
+        { label: "Respostas", value: "1", icon: <MessageSquare size={20} />, color: "text-emerald-400" },
+        { label: "Taxa de Entrega", value: "16.67%", icon: <CheckCheck size={20} />, color: "text-sky-400" },
+      ],
+      whatsappStats: [
+        { 
+          status: "Lido", 
+          qty: 25, 
+          pct: "27,78%", 
+          icon: <Eye size={14} className="text-pink-500" />, 
+          color: "bg-pink-500",
+          textColor: "text-pink-500"
+        },
+        { 
+          status: "Entregue", 
+          qty: 15, 
+          pct: "16,67%", 
+          icon: <CheckCheck size={14} className="text-sky-400" />, 
+          color: "bg-sky-400",
+          textColor: "text-sky-400"
+        },
+        { 
+          status: "Respondido", 
+          qty: 1, 
+          pct: "1,11%", 
+          icon: <MessageSquare size={14} className="text-emerald-400" />, 
+          color: "bg-emerald-400",
+          textColor: "text-emerald-400"
+        },
+        { 
+          status: "Não entregue (Erro)", 
+          qty: 49, 
+          pct: "54,44%", 
+          icon: <AlertCircle size={14} className="text-red-500" />, 
+          color: "bg-red-500",
+          textColor: "text-red-500"
+        },
+      ]
+    }
+  ];
+
+  return (
+    <div className="min-h-screen bg-[#050505] text-slate-200 font-sans selection:bg-sky-500/30 pb-20">
+      {/* Brilhos de Fundo */}
+      <div className="fixed inset-0 pointer-events-none overflow-hidden">
+        <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] bg-sky-500/10 blur-[120px] rounded-full"></div>
+        <div className="absolute bottom-[-10%] right-[-10%] w-[30%] h-[30%] bg-emerald-500/5 blur-[100px] rounded-full"></div>
+      </div>
+
+      <div className="relative z-10 max-w-7xl mx-auto px-6 py-8">
+        
+        {/* Cabeçalho Geral */}
+        <header className="mb-16">
+          <div className="flex items-center gap-3 mb-6">
+            <img src="https://storage.googleapis.com/etp-bucket/Logos%20Xertica.ai%20%28.png%29/xertica.ai/Copy%20of%20Logo_XERTICA_white.png" alt="Xertica" className="h-6" />
+            <div className="h-4 w-px bg-white/20"></div>
+            <span className="text-xs font-bold tracking-[0.3em] uppercase text-slate-500">Master Analytics Dashboard</span>
+          </div>
+          <h1 className="text-5xl font-extrabold text-white tracking-tight">Relatório de Campanhas Consolidadas</h1>
+          <p className="text-slate-400 mt-4 text-lg max-w-2xl">
+            Visão unificada das métricas de desempenho para os eventos do setor público e justiça.
+          </p>
         </header>
 
-        <!-- KPI Grid -->
-        <div id="kpi-container" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-10 fade-in">
-            <!-- KPIs injetados via JS -->
-        </div>
-
-        <!-- Main Content Card -->
-        <div class="w-full bg-slate-900/40 backdrop-blur-md border border-white/10 p-8 rounded-3xl shadow-2xl fade-in">
-            <h3 class="text-lg font-bold text-white flex items-center gap-2 mb-8">
-                <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 text-emerald-400" viewBox="0 0 24 24" fill="currentColor">
-                    <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z"/></svg>
-                Status de Comunicação Detalhado (WhatsApp)
-            </h3>
-            
-            <!-- Stats Grid -->
-            <div id="stats-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-10">
-                <!-- Status injetados via JS -->
-            </div>
-
-            <!-- Funnel Visualization -->
-            <div class="pt-4">
-                <div class="flex justify-between items-end mb-3">
-                    <span class="text-xs font-bold text-slate-400 uppercase tracking-widest">Distribuição Visual do Funil</span>
-                    <span id="interest-info" class="text-xs text-sky-400 font-bold">8 PESSOAS INTERESSADAS</span>
+        {/* Mapeamento das Campanhas */}
+        <div className="space-y-32">
+          {campaigns.map((campaign) => (
+            <section key={campaign.id} className="relative">
+              {/* Título da Campanha */}
+              <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-10 pb-6 border-b border-white/5">
+                <div>
+                  <h2 className="text-3xl font-bold text-white flex items-center gap-3">
+                    <div className="w-2 h-8 bg-sky-500 rounded-full"></div>
+                    {campaign.title}
+                  </h2>
+                  <p className="text-slate-400 mt-2">
+                    {campaign.description} 
+                    <span className="ml-3 px-2 py-0.5 bg-white/5 rounded text-sky-400 text-xs font-mono">Ref: {campaign.dateRef}</span>
+                  </p>
                 </div>
-                <div id="funnel-bar" class="flex h-6 w-full rounded-full overflow-hidden shadow-2xl bg-white/5 border border-white/5">
-                    <!-- Segmentos do funil injetados via JS -->
-                </div>
-            </div>
-        </div>
-    </div>
+              </div>
 
-    <script>
-        const data = {
-            summit: {
-                desc: "Foco em modernização do setor público. <span class='ml-2 px-2 py-0.5 bg-white/5 rounded text-sky-400 text-xs font-mono'>Ref: 16/03/2026</span>",
-                interest: "8 PESSOAS INTERESSADAS",
-                kpis: [
-                    { label: "Mensagens Totais", value: "324", color: "text-white" },
-                    { label: "Taxa de Leitura", value: "57.1%", color: "text-pink-500" },
-                    { label: "Respostas", value: "12", color: "text-emerald-400" },
-                    { label: "Taxa de Entrega", value: "91.7%", color: "text-sky-400" }
-                ],
-                stats: [
-                    { status: "Lido", qty: 185, pct: "57.1%", color: "bg-pink-500", text: "text-pink-500" },
-                    { status: "Entregue", qty: 100, pct: "30.9%", color: "bg-sky-400", text: "text-sky-400" },
-                    { status: "Respondido", qty: 12, pct: "3.7%", color: "bg-emerald-400", text: "text-emerald-400" },
-                    { status: "Erro", qty: 27, pct: "8.3%", color: "bg-red-500", text: "text-red-500" }
-                ]
-            },
-            enastic: {
-                desc: "Estratégias de IA para o Ecossistema de Justiça. <span class='ml-2 px-2 py-0.5 bg-white/5 rounded text-sky-400 text-xs font-mono'>Ref: 18/03/2026</span>",
-                interest: "DADOS EM PROCESSAMENTO",
-                kpis: [
-                    { label: "Mensagens Totais", value: "90", color: "text-white" },
-                    { label: "Taxa de Leitura", value: "27.7%", color: "text-pink-500" },
-                    { label: "Respostas", value: "1", color: "text-emerald-400" },
-                    { label: "Taxa de Entrega", value: "45.5%", color: "text-sky-400" }
-                ],
-                stats: [
-                    { status: "Lido", qty: 25, pct: "27.7%", color: "bg-pink-500", text: "text-pink-500" },
-                    { status: "Entregue", qty: 15, pct: "16.7%", color: "bg-sky-400", text: "text-sky-400" },
-                    { status: "Respondido", qty: 1, pct: "1.1%", color: "bg-emerald-400", text: "text-emerald-400" },
-                    { status: "Erro", qty: 49, pct: "54.4%", color: "bg-red-500", text: "text-red-500" }
-                ]
-            }
-        };
-
-        function switchTab(tab) {
-            const campaign = data[tab];
-            
-            // Botões de navegação
-            const btnSummit = document.getElementById('btn-summit');
-            const btnEnastic = document.getElementById('btn-enastic');
-            
-            const activeClass = 'bg-sky-500 text-slate-950 shadow-lg shadow-sky-500/20';
-            const inactiveClass = 'text-slate-400 hover:text-white';
-
-            if (tab === 'summit') {
-                btnSummit.className = `px-6 py-2.5 rounded-xl text-sm font-bold transition-all duration-300 ${activeClass}`;
-                btnEnastic.className = `px-6 py-2.5 rounded-xl text-sm font-bold transition-all duration-300 ${inactiveClass}`;
-            } else {
-                btnSummit.className = `px-6 py-2.5 rounded-xl text-sm font-bold transition-all duration-300 ${inactiveClass}`;
-                btnEnastic.className = `px-6 py-2.5 rounded-xl text-sm font-bold transition-all duration-300 ${activeClass}`;
-            }
-
-            document.getElementById('campaign-desc').innerHTML = campaign.desc;
-            document.getElementById('interest-info').innerText = campaign.interest;
-
-            // Renderizar KPIs
-            const kpiContainer = document.getElementById('kpi-container');
-            kpiContainer.classList.remove('fade-in');
-            void kpiContainer.offsetWidth; // Trigger reflow
-            kpiContainer.classList.add('fade-in');
-            
-            kpiContainer.innerHTML = campaign.kpis.map(kpi => `
-                <div class="group bg-slate-900/40 backdrop-blur-md border border-white/10 p-6 rounded-3xl hover:border-white/20 transition-all duration-300">
-                    <h3 class="text-slate-400 text-sm font-medium">${kpi.label}</h3>
-                    <p class="text-3xl font-bold ${kpi.color} mt-1">${kpi.value}</p>
-                </div>
-            `).join('');
-
-            // Renderizar Grid de Status
-            const statsGrid = document.getElementById('stats-grid');
-            statsGrid.innerHTML = campaign.stats.map(s => `
-                <div class="flex flex-col p-6 bg-white/5 rounded-2xl border border-white/5 hover:bg-white/[0.08] transition-all">
-                    <div class="flex items-center justify-between mb-4">
-                        <div class="w-3.5 h-3.5 rounded-full ${s.color} shadow-sm"></div>
-                        <div class="text-[10px] text-slate-500 font-mono font-bold">${s.pct}</div>
+              {/* Grelha de KPIs */}
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-10">
+                {campaign.kpis.map((kpi, idx) => (
+                  <div key={idx} className="bg-slate-900/40 backdrop-blur-md border border-white/10 p-6 rounded-3xl hover:border-sky-500/30 transition-all group">
+                    <div className="flex justify-between items-start mb-4">
+                      <div className={`p-3 rounded-2xl bg-white/5 ${kpi.color} group-hover:scale-110 transition-transform`}>
+                        {kpi.icon}
+                      </div>
                     </div>
-                    <span class="text-xs font-bold text-slate-500 uppercase tracking-widest mb-1">${s.status}</span>
-                    <div class="text-2xl font-black text-white">${s.qty}</div>
+                    <h3 className="text-slate-400 text-sm font-medium">{kpi.label}</h3>
+                    <p className="text-3xl font-bold text-white mt-1">{kpi.value}</p>
+                  </div>
+                ))}
+              </div>
+
+              {/* Secção de Status Detalhado */}
+              <div className="w-full bg-slate-900/40 backdrop-blur-md border border-white/10 p-8 rounded-3xl shadow-2xl">
+                <div className="flex justify-between items-center mb-8">
+                  <h3 className="text-lg font-bold text-white flex items-center gap-2">
+                    <BarChart3 size={18} className="text-sky-400" />
+                    Status de Comunicação (WhatsApp)
+                  </h3>
+                  <div className="text-[10px] font-bold text-slate-500 uppercase tracking-widest font-mono">
+                    ID: {campaign.id.toUpperCase()}
+                  </div>
                 </div>
-            `).join('');
+                
+                <div className="space-y-10">
+                  {/* Cartões de Status */}
+                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+                    {campaign.whatsappStats.map((stat, idx) => (
+                      <div key={idx} className="flex flex-col p-6 bg-white/5 rounded-2xl border border-white/5 group hover:border-white/10 transition-all">
+                        <div className="flex items-center justify-between mb-4">
+                          <div className={`p-2 rounded-lg ${stat.color} bg-opacity-20`}>
+                            {stat.icon}
+                          </div>
+                          <div className="text-[10px] text-slate-500 font-mono font-bold">{stat.pct}</div>
+                        </div>
+                        <span className="text-xs font-bold text-slate-500 uppercase tracking-widest mb-1">{stat.status}</span>
+                        <div className="text-2xl font-black text-white">{stat.qty}</div>
+                      </div>
+                    ))}
+                  </div>
 
-            // Renderizar Barra de Funil
-            document.getElementById('funnel-bar').innerHTML = campaign.stats.map(s => `
-                <div style="width: ${s.pct}" class="${s.color} h-full border-r border-black/20 last:border-0 transition-all duration-500" title="${s.status}: ${s.pct}"></div>
-            `).join('');
-        }
+                  {/* Visualização da Barra do Funil */}
+                  <div className="pt-4">
+                    <div className="flex justify-between items-end mb-3">
+                      <span className="text-xs font-bold text-slate-400 uppercase tracking-widest">Distribuição Visual do Funil</span>
+                      <span className="text-xs text-sky-400 font-mono">Amostra: {campaign.id === 'summit' ? '323' : '90'} msgs</span>
+                    </div>
+                    <div className="flex h-6 w-full rounded-full overflow-hidden shadow-2xl bg-white/5 border border-white/5">
+                      {campaign.whatsappStats.map((s, i) => (
+                        <div 
+                          key={i} 
+                          className={`${s.color} hover:brightness-125 transition-all cursor-default relative group border-r border-black/20 last:border-0`} 
+                          style={{ width: s.pct.replace(',', '.') }}
+                        >
+                          <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-2 py-1 bg-white text-black text-[10px] font-bold rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap z-20 shadow-xl">
+                            {s.status}: {s.qty} ({s.pct})
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                    
+                    {/* Legenda */}
+                    <div className="flex flex-wrap gap-6 justify-center mt-8">
+                      {campaign.whatsappStats.map((s, i) => (
+                        <div key={i} className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-white/5 border border-white/5">
+                          <div className={`w-2.5 h-2.5 rounded-full ${s.color} shadow-lg shadow-black/40`}></div>
+                          <span className={`text-[10px] font-bold uppercase tracking-wider ${s.textColor}`}>{s.status}</span>
+                        </div>
+                      ))}
+                    </div>
 
-        // Iniciar com a primeira aba
-        window.onload = () => switchTab('summit');
-    </script>
-</body>
-</html>
+                    {/* Fonte de Dados */}
+                    <div className="mt-10 flex justify-center">
+                      <a 
+                        href={campaign.dataSourceUrl} 
+                        target="_blank" 
+                        rel="noopener noreferrer"
+                        className="group flex items-center gap-3 px-4 py-2 rounded-xl bg-white/5 border border-white/10 hover:border-emerald-500/50 hover:bg-emerald-500/10 transition-all duration-300"
+                      >
+                        <FileSpreadsheet size={16} className="text-emerald-400 group-hover:scale-110 transition-transform" />
+                        <div className="text-left leading-none">
+                          <span className="block text-[8px] uppercase font-bold text-slate-500 tracking-[0.2em] mb-1">Fonte de Dados</span>
+                          <span className="flex items-center gap-2 text-[10px] text-slate-300 font-bold uppercase tracking-wider group-hover:text-white transition-colors">
+                            Planilha de Referência ({campaign.title})
+                            <ExternalLink size={10} className="text-slate-600" />
+                          </span>
+                        </div>
+                      </a>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </section>
+          ))}
+        </div>
+      </div>
+
+      <footer className="py-20 text-center opacity-30 border-t border-white/5 mt-20">
+        <img src="https://storage.googleapis.com/etp-bucket/Logos%20Xertica.ai%20%28.png%29/xertica.ai/Copy%20of%20Logo_XERTICA_white.png" alt="Xertica" className="h-4 mx-auto mb-4 grayscale" />
+        <p className="text-[10px] font-mono uppercase tracking-[0.5em]">Internal Performance Report</p>
+      </footer>
+    </div>
+  );
+};
+
+export default App;
